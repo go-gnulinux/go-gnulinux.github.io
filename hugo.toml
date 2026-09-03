@@ -1,0 +1,27 @@
+baseURL = "https://go-gnulinux.github.io/"
+title = "go-gnulinux"
+disableKinds = ["taxonomy", "term", "RSS", "sitemap", "404"]
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+# Each repo card.
+# "kind"  = which slice: transport / factors.
+# "type"  = lib (importable module) vs tool.
+# "ci"    = true only where a GitHub Actions ci.yml actually exists, so the CI
+#           badge never renders an empty "no status" -- honest badges only.
+# "blurb" = drawn straight from each repo's README.
+[[params.repos]]
+  name = "fido"
+  kind = "transport"
+  type = "lib"
+  version = "v0.1.1"
+  ci = true
+  blurb = "A FIDO security key over `hidraw`: `/sys/class/hidraw` enumeration, the `uevent` file parsed by hand, and the usage page `0xF1D0` read through `HIDIOCGRDESC`. No libudev, and therefore no cgo."
+[[params.repos]]
+  name = "factors"
+  kind = "factors"
+  type = "lib"
+  version = "v0.1.0"
+  ci = true
+  blurb = "The security key as an `mfa.Factor`. Almost nothing is here on purpose — asking a key is the same everywhere CTAP is. What stays is what only Linux knows: where a key is, and that one you may not *open* is not one that refused."
