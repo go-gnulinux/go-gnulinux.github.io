@@ -1,0 +1,60 @@
+# A check, separate from deploy.yml, which publishes.
+#
+# deploy.yml holds `pages: write` and `id-token: write`, so giving it a
+# `pull_request` trigger would let a pull request deploy the site. The checks
+# live here with `contents: read` and nothing else -- and this is what a pull
+# request in this repository is judged on. It had nothing: four dependency
+# updates sat open with no check at all, including a Hugo major.
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: the site still builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Pinned to the same version deploy.yml uses, so this job judges what
+      # will actually be published rather than whatever is newest.
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.162.1"
+          extended: true
+
+      # PROVES: Hugo accepts the content and layouts. `--baseURL` is passed
+      # because deploy.yml passes one; building without it exercises a
+      # different code path in the templates.
+      - name: build
+        run: hugo --minify --baseURL "https://go-gnulinux.github.io/"
+
+      # PROVES: it produced the SITE, not merely a directory.
+      #
+      # ⛔ Counting files does not do this. An EMPTY Hugo project builds
+      # clean and writes four files -- index.xml, sitemap.xml and two taxonomy
+      # directories -- while this site writes three, so a "at least N files"
+      # gate passes the empty project and fails the real one. Measured, after
+      # very nearly shipping exactly that gate.
+      #
+      # What an empty project does NOT write is index.html, and what it cannot
+      # write is the repository cards, which come from content/_index.md. Both
+      # are checked, so a build that silently loses its content is a failure
+      # rather than a smaller number nobody reads.
+      - name: it produced the site
+        run: |
+          test -s public/index.html || { echo "::error::no index.html: an empty project builds clean and writes none"; exit 1; }
+          bytes=$(wc -c < public/index.html)
+          echo "index.html: $bytes bytes"
+          test "$bytes" -ge 2000 || { echo "::error::index.html is $bytes bytes, which is a shell and not the page"; exit 1; }
+          for card in go-gnulinux/fido go-gnulinux/factors; do
+            grep -q "$card" public/index.html || { echo "::error::the $card card is missing from the built page"; exit 1; }
+          done
