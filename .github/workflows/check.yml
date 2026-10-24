@@ -23,6 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Hugo resolves the landingkit module (hugo.toml [module]) with the go
+      # command, at the version go.mod pins.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: false
       # Pinned to the same version deploy.yml uses, so this job judges what
       # will actually be published rather than whatever is newest.
       - name: Set up Hugo
