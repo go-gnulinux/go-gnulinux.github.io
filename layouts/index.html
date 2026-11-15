@@ -44,14 +44,12 @@
   <div class="hero"><div class="wrap">
     <div>
       <h1 class="head">go-gnulinux</h1>
-      <p class="sub">Linux system interfaces in <strong>pure Go</strong> — reached through
+      <p class="sub">Linux system interfaces in <strong>{{ if partial "mantra-on.html" . }}Go{{ else }}pure Go{{ end }}</strong> — reached through
       <code>/sys</code>, <code>ioctl</code> and ordinary file descriptors, with
-      <strong>no libudev, no hidapi and no cgo</strong>.</p>
-      <div class="cta">
-        <a class="btn btn-primary" href="https://github.com/go-gnulinux/.github/blob/main/profile/README.md">{{ partial "icons/book.html" . }}Documentation</a>
-        <a class="btn btn-ghost" href="https://github.com/go-gnulinux">{{ partial "icons/github.html" . }}GitHub</a>
-      </div>
-      <div class="trust">{{ if not (partial "mantra-on.html" $) }}<span class="pill">CGO_ENABLED=0</span>{{ end }}<span class="pill">no libudev</span><span class="pill">hidraw · sysfs · ioctl</span><span class="pill">11 architectures</span><span class="pill">udev rule named, not guessed</span><span class="pill">100% coverage</span></div>
+      <strong>no libudev, no hidapi and {{ if not (partial "mantra-on.html" $) }}no cgo{{ end }}</strong>.</p>
+      {{/* [[params.cta]] in hugo.toml: the kit renders the row */}}
+      {{ partial "cta.html" . }}
+      <div class="trust">{{ if not (partial "mantra-on.html" $) }}{{ if not (partial "mantra-on.html" $) }}<span class="pill">CGO_ENABLED=0</span>{{ end }}{{ end }}<span class="pill">no libudev</span><span class="pill">hidraw · sysfs · ioctl</span><span class="pill">11 architectures</span><span class="pill">udev rule named, not guessed</span><span class="pill">100% coverage</span></div>
     </div>
     {{ partial "hero-carousel.html" . }}
   </div></div>
